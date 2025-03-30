@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login/Register</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+
+    .tab-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+
+    .tab-buttons button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+      font-size: 16px;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-buttons button.active {
+      border-bottom-color: #007BFF;
+      color: #007BFF;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .input-group input.error {
+      border-color: #dc3545;
+    }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+<div id="app">
+  <div class="container">
+    <div class="tab-buttons">
+      <button :class="{ active: isLogin }" @click="isLogin = true">登录</button>
+      <button :class="{ active: !isLogin }" @click="isLogin = false">注册</button>
+    </div>
+    <form @submit.prevent="submitForm">
+      <div class="input-group">
+        <label for="email">邮箱</label>
+        <input type="email" id="email" v-model="email" :class="{ error: errors.email }">
+        <div class="error-message" v-if="errors.email">{{ errors.email }}</div>
+      </div>
+      <div class="input-group">
+        <label for="password">密码</label>
+        <input type="password" id="password" v-model="password" :class="{ error: errors.password }">
+        <div class="error-message" v-if="errors.password">{{ errors.password }}</div>
+      </div>
+      <div v-if="!isLogin" class="input-group">
+        <label for="confirmPassword">确认密码</label>
+        <input type="password" id="confirmPassword" v-model="confirmPassword" :class="{ error: errors.confirmPassword }">
+        <div class="error-message" v-if="errors.confirmPassword">{{ errors.confirmPassword }}</div>
+      </div>
+      <div v-if="!isLogin" class="input-group">
+        <label for="phone">手机号</label>
+        <input type="tel" id="phone" v-model="phone" :class="{ error: errors.phone }">
+        <div class="error-message" v-if="errors.phone">{{ errors.phone }}</div>
+      </div>
+      <button type="submit">{{ isLogin ? '登录' : '注册' }}</button>
+    </form>
+  </div>
+</div>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+  const { createApp, ref } = Vue;
+
+  const app = createApp({
+    setup() {
+      const isLogin = ref(true);
+      const email = ref('');
+      const password = ref('');
+      const confirmPassword = ref('');
+      const phone = ref('');
+      const errors = ref({});
+
+      const validateForm = () => {
+        const newErrors = {};
+        if (!email.value) {
+          newErrors.email = '邮箱为必填项';
+        }
+        if (!password.value) {
+          newErrors.password = '密码为必填项';
+        }
+        if (!isLogin.value) {
+          if (password.value !== confirmPassword.value) {
+            newErrors.confirmPassword = '两次输入的密码不一致';
+          }
+          if (!phone.value) {
+            newErrors.phone = '手机号为必填项';
+          }
+        }
+        errors.value = newErrors;
+        return Object.keys(newErrors).length === 0;
+      };
+
+      const submitForm = () => {
+        if (validateForm()) {
+          if (isLogin.value) {
+            console.log('登录成功', { email: email.value, password: password.value });
+          } else {
+            console.log('注册成功', { email: email.value, password: password.value, phone: phone.value });
+          }
+        }
+      };
+
+      return {
+        isLogin,
+        email,
+        password,
+        confirmPassword,
+        phone,
+        errors,
+        submitForm
+      };
+    }
+  });
+
+  app.mount('#app');
+</script>
+</body>
+
+</html>
